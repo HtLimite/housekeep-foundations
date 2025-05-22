@@ -19,8 +19,11 @@ import com.jzo2o.foundations.model.dto.request.ServeUpsertReqDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageHelperUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -125,8 +128,9 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
             throw new ForbiddenOperationException("删除服务失败！");
         }
     }
-
     @Override
+    @CachePut(value = RedisConstants.CacheName.SERVE, key = "#id",  cacheManager = RedisConstants.CacheManager.ONE_DAY)
+    @Transactional
     public Serve onSale(Long id) {
         Serve serve = baseMapper.selectById(id);
         if (ObjectUtils.isNull(serve)){
@@ -157,6 +161,8 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
     }
 
     @Override
+    @CacheEvict(value = RedisConstants.CacheName.SERVE, key = "#id")
+    @Transactional
     public Serve offSale(Long id) {
         Serve serve = baseMapper.selectById(id);
         if (ObjectUtils.isNull(serve)){
