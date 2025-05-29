@@ -28,7 +28,7 @@ import java.util.List;
 @SpringBootTest
 class HomeServiceTest {
 //    @Resource
-//    private HomeService homeService;
+//    private HomeServiceImpl homeService;
 
 //    @Test
 //    void queryServeIconCategoryByCityCodeCache() {

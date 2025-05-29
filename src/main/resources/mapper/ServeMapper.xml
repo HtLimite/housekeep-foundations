@@ -26,4 +26,52 @@
 
 
     </select>
+
+
+    <select id="findServeIconCategoryByRegionId"
+            resultMap="ServeCattegoryMap"
+            parameterType="java.lang.Long">
+
+        select st.id       serve_type_id,
+               serve.city_code,
+               st.serve_type_icon,
+               st.name     serve_type_name,
+               st.sort_num serve_type_sort_num,
+               st.id       serve_item_id,
+               st.name     serve_item_name,
+               si.sort_num serve_item_sort_num,
+               si.serve_item_icon,
+               serve.id    serve_id
+
+        from serve
+                 inner join serve_item si on serve.serve_item_id = si.id
+                 inner join serve_type st on si.serve_type_id = st.id
+        where serve.region_id = #{regionId} and serve.sale_status = 2
+
+        order by st.sort_num, si.sort_num
+    </select>
+
+    <!--手动的映射-->
+    <resultMap id="ServeCattegoryMap" type="com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO">
+        <!--id映射主键字段-->
+        <!--将所有查询数据，按照 serveTypeId 分组-->
+        <id property="serveTypeId" column="serve_type_id"/>
+        <!--result映射普通字段-->
+        <result property="serveTypeName" column="serve_type_name"/>
+        <result property="serveTypeIcon" column="serve_type_icon"/>
+        <result property="cityCode" column="city_code"/>
+        <result property="serveTypeSortNum" column="serve_type_sort_num"/>
+        <!--一对多映射-->
+        <!--column 数据库中的字段名-->
+        <!--property 实体类中对应的属性 该关键字可以省略... -->
+        <!--ofType 是javaType中的单个对象类型-->
+        <collection property="serveResDTOList" ofType="com.jzo2o.foundations.model.dto.response.ServeSimpleResDTO">
+            <id property="id" column="serve_id"/>
+            <result property="serveItemId" column="serve_item_id"/>
+            <result property="serveItemName" column="serve_item_name"/>
+            <result property="serveItemIcon" column="serve_item_icon"/>
+            <result property="serveItemSortNum" column="serve_item_sort_num"/>
+        </collection>
+
+    </resultMap>
 </mapper>

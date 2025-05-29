@@ -2,6 +2,7 @@ package com.jzo2o.foundations.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.jzo2o.foundations.model.domain.Serve;
+import com.jzo2o.foundations.model.dto.response.ServeCategoryResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
 import feign.Param;
 
@@ -23,5 +24,12 @@ public interface ServeMapper extends BaseMapper<Serve> {
      * @return
      */
     List<ServeResDTO> queryServeListByRegionId(@Param("regionId") Long regionId);
+
+    /**
+     * 首页服务列表
+     * @param regionId
+     * @return
+     */
+    List<ServeCategoryResDTO>  findServeIconCategoryByRegionId(@Param("regionId") Long regionId);
 
 }

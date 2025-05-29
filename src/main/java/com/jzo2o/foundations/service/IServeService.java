@@ -79,4 +79,5 @@ public interface IServeService extends IService<Serve> {
     Serve onHot(Long id);
 
     Serve offHot(Long id);
+
 }
