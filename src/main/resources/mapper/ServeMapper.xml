@@ -74,4 +74,41 @@
         </collection>
 
     </resultMap>
+
+    <select id="findServeTypeListByRegionId" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationTypeSimpleResDTO">
+        SELECT
+            type.id as serve_type_id,
+            type.name as serve_type_name,
+            type.img as serve_type_img
+        FROM
+            serve
+                inner JOIN serve_item AS item ON serve.serve_item_id = item.id
+                inner JOIN serve_type AS type ON type.id = item.serve_type_id
+        WHERE
+            serve.region_id = #{regionId}
+          AND serve.sale_status = 2
+        GROUP BY
+            type.id
+        ORDER BY
+            type.sort_num ASC,
+            type.create_time DESC;
+    </select>
+
+    <select id="findHotServeListByRegionId" resultType="com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO">
+        SELECT serve.id,
+               serve.serve_item_id,
+               serve.price,
+               serve.city_code,
+               item.name AS serve_item_name,
+               item.img  AS serve_item_img,
+               item.detail_img,
+               item.unit
+        FROM serve
+                 inner JOIN serve_item AS item ON serve.serve_item_id = item.id
+        WHERE serve.is_hot = 1
+          AND serve.sale_status = 2
+          AND serve.region_id = #{regionId}
+        ORDER BY serve.update_time DESC
+    </select>
+
 </mapper>

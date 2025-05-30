@@ -1,5 +1,6 @@
 package com.jzo2o.foundations.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.jzo2o.common.expcetions.CommonException;
 import com.jzo2o.common.expcetions.ForbiddenOperationException;
@@ -16,7 +17,9 @@ import com.jzo2o.foundations.model.domain.Serve;
 import com.jzo2o.foundations.model.domain.ServeItem;
 import com.jzo2o.foundations.model.dto.request.ServePageQueryReqDTO;
 import com.jzo2o.foundations.model.dto.request.ServeUpsertReqDTO;
+import com.jzo2o.foundations.model.dto.response.ServeAggregationSimpleResDTO;
 import com.jzo2o.foundations.model.dto.response.ServeResDTO;
+import com.jzo2o.foundations.service.IHomeService;
 import com.jzo2o.foundations.service.IServeService;
 import com.jzo2o.mysql.utils.PageHelperUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -46,7 +49,12 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
 
     @Resource
     private RegionMapper regionMapper;
-    private Serve serve;
+
+    @Resource
+    private IHomeService homeService;
+
+    @Resource
+    private IServeService serveService;
 
     // 缓存key，支持SpEL表达式(spring boot 提供 ，支持 取对象属性及执行属性方法)，上述代码表示取参数id的值作为key
     // 最终缓存key为：缓存名称+“::”+key
@@ -218,6 +226,23 @@ public class ServeServiceImpl extends ServiceImpl<ServeMapper, Serve> implements
             throw new CommonException("设置热门服务失败！");
         }
         return baseMapper.selectById(id);    }
+
+    @Override
+    public ServeAggregationSimpleResDTO findDetailById(Long id) {
+        //1.查询服务信息
+        Serve serve = homeService.queryServeByIdCache(id);
+
+        //2.查询服务项信息
+        ServeItem serveItem = homeService.queryServeItemByIdCache(serve.getServeItemId());
+
+        //3.封装数据
+        ServeAggregationSimpleResDTO serveAggregationSimpleResDTO = BeanUtil.toBean(serve, ServeAggregationSimpleResDTO.class);
+        serveAggregationSimpleResDTO.setServeItemName(serveItem.getName());
+        serveAggregationSimpleResDTO.setServeItemImg(serveItem.getImg());
+        serveAggregationSimpleResDTO.setDetailImg(serveItem.getDetailImg());
+        serveAggregationSimpleResDTO.setUnit(serveItem.getUnit());
+        return serveAggregationSimpleResDTO;
+    }
 
 
 }
